@@ -66,7 +66,7 @@ if (ins_method == 'oral') {
   pcolumn <- 'ins_int'
   
   #calculate intermediate pesticide index (mean of oral and contact toxicity)
-  pestable <- dplyr::mutate(pestable, ins_int = ld50_ct_ha_bil + ld50_or_ha_bil /2) %>%
+  pestable <- dplyr::mutate(pestable, ins_int = (ld50_ct_ha_bil + ld50_or_ha_bil) /2) %>%
     dplyr::mutate(ins_int= tidyr::replace_na(ins_int, 0))
 }
 
