@@ -1,0 +1,17 @@
+Package: SpeedyBeeModel
+Title: Calculates indices of landscape quality for bees
+Version: 0.0.0.9000
+Authors@R: 
+    person(given = "Melanie",
+           family = "Kammerer",
+           role = c("aut", "cre"),
+           email = "melanie.a.kammerer@gmail.com",
+           comment = c(ORCID = "0000-0002-0678-9087"))
+Description: New, faster implementation of the indices in InVESTwrap, including insecticide index (Douglas et al.), forage and nesting quality (Lonsdorf et al. 2007 and Koh et al. 2016). No longer depends on InVEST model.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.1
+Imports: 
+    magrittr
