@@ -140,7 +140,7 @@ forage_index <- function(output_dir, landcover_path, foragetable_path,
   }
   
   for (season in seasons) {
-    fcolumn <- names(select(forage_table, dplyr::contains(season, ignore.case = T)))
+    fcolumn <- names(dplyr::select(forage_table, dplyr::contains(season, ignore.case = T)))
     #reclassify land use to seasonal forage index
     for.r <- raster::reclassify(hab.r, forage_table[,c("LULC", fcolumn)])
     
