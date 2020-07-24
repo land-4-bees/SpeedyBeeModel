@@ -2,7 +2,7 @@
 % Please edit documentation in R/forage_index.R
 \name{forage_index}
 \alias{forage_index}
-\title{Calculate bee landscape indices}
+\title{Calculate landscape forage quality index}
 \usage{
 forage_index(
   output_dir,
