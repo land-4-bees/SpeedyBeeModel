@@ -19,8 +19,11 @@
 forage_index <- function(output_dir, landcover_path, foragetable_path, 
                           forage_range = NA, guild_table = NA, 
                           agg_factor=NA, normalize=F, useW=F, 
-                          check_foragetable=T, seasons, rastertag=NA) {
+                          check_foragetable=T, seasons, rastertag=NA,
+                          compress_rasters=T) {
     
+  tifoptions <- c("COMPRESS=DEFLATE", "PREDICTOR=2", "ZLEVEL=6")
+  
   #save landscape name, use to label results rasters
   land_name <- gsub(basename(landcover_path), pattern=".tif", replacement="")
   
@@ -132,7 +135,7 @@ forage_index <- function(output_dir, landcover_path, foragetable_path,
         dir.create(paste0(output_dir,"/intermediate"))
       }
     
-      raster::writeRaster(window_sum, windowsum_path, overwrite=T)
+      raster::writeRaster(window_sum, windowsum_path, overwrite=T, options=tifoptions)
     }
   }
   
@@ -146,14 +149,16 @@ forage_index <- function(output_dir, landcover_path, foragetable_path,
       for.r <- raster::aggregate(for.r, fact = agg_factor, fun = mean)
       
       #strange behavior with applying moving window analysis to raster necessitates writing and reading aggregated rasters again
-      raster::writeRaster(for.r, paste0(output_dir, "/for_reclass_agg_", land_name, ".tif"), overwrite=F, NAflag=255)
+      raster::writeRaster(for.r, paste0(output_dir, "/for_reclass_agg_", land_name, ".tif"),
+                          overwrite=F, NAflag=255, options=tifoptions)
       for.r <- raster::raster(paste0(output_dir, "/for_reclass_agg_", land_name, ".tif"))
     }
   
     #if aggregation factor is supplied, reduce land use raster resolution
     if (!is.na(agg_factor)) {
       hab.r <- raster::aggregate(hab.r, fact = agg_factor,fun = raster::modal)
-      raster::writeRaster(hab.r, paste0(output_dir, "/hab_agg_", land_name, ".tif"), overwrite=F, NAflag=255)
+      raster::writeRaster(hab.r, paste0(output_dir, "/hab_agg_", land_name, ".tif"),
+                          overwrite=F, NAflag=255, options=tifoptions)
       hab.r <- raster::raster(paste0(output_dir, "/hab_agg_", land_name, ".tif"))
     }
   
@@ -185,11 +190,11 @@ forage_index <- function(output_dir, landcover_path, foragetable_path,
     if (!is.na(rastertag)) {
       #write output raster
       raster::writeRaster(simp.for, paste0(output_dir,"/", land_name, "_", season, 
-                         "_", rastertag, ".tif"), overwrite=T)
+                         "_", rastertag, ".tif"), overwrite=T, options=tifoptions)
     } else {
       #write output raster
       raster::writeRaster(simp.for, paste0(output_dir,"/", land_name, "_", season, 
-                                           ".tif"), overwrite=T)
+                                           ".tif"), overwrite=T, options=tifoptions)
     }
   }
 }
