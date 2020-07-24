@@ -110,14 +110,14 @@ forage_index <- function(output_dir, landcover_path, foragetable_path,
   #set up window sum raster (used in normalization later)
   if (normalize == T) {
     
+    #convert land use raster > 0 into all ones (will use to clip output raster and calc moving window normalization values)
+    mask_land <- raster::reclassify(hab.r, cbind(1, max(raster::values(hab.r), na.rm=T), 1))
+    
     windowsum_path <- paste0(output_dir,"/intermediate/", land_name,"_windowsum.tif")
     
     if (file.exists(windowsum_path)) {
       window_sum <- raster::raster(windowsum_path)
     } else {
-      
-      #convert land use raster > 0 into all ones (will use to clip output raster and calc moving window normalization values)
-      mask_land <- raster::reclassify(hab.r, cbind(1, max(raster::values(hab.r), na.rm=T), 1))
       
       #calculate moving window weight sums across raster (will be the same value for most of the raster except along edges)
       mask <- raster::as.matrix(mask_land)
