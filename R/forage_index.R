@@ -1,4 +1,4 @@
-#' Calculate bee landscape indices
+#' Calculate landscape forage quality index
 #'
 #' New implemenatation of landsacpe forage quality index (Lonsdorf et al 2009). Uses FFT convolution to improve runtime.
 #' @param output_dir Path to directory for output files.
