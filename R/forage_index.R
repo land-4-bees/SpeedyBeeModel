@@ -4,6 +4,7 @@
 #' @param output_dir Path to directory for output files.
 #' @param landcover_path Path to land cover raster, including base file name
 #' @param foragetable_path Path to forage quality by land use table
+#' @param forage_table Forage quality by land use table (insead of foragetable_path)
 #' @param forage_range Foraging range (in m) to use for distance weighting forage scores surrounding focal cell.
 #' @param guild_table Bee community to use to model foraging activity. Includes foraging range and relative abundnace of each species.
 #' @param agg_factor Aggregation factor for large rasters (use 4 to convert 50m to 120m resolution CDL)
@@ -16,8 +17,8 @@
 #' @examples
 #' 
 #' 
-forage_index <- function(output_dir, landcover_path, foragetable_path, 
-                          forage_range = NA, guild_table = NA, 
+forage_index <- function(output_dir, landcover_path, foragetable_path = NA, 
+                          forage_table, forage_range = NA, guild_table = NA, 
                           agg_factor=NA, normalize=F, useW=F, 
                           check_foragetable=T, seasons, rastertag=NA,
                           compress_rasters=T) {
@@ -28,7 +29,9 @@ forage_index <- function(output_dir, landcover_path, foragetable_path,
   land_name <- gsub(basename(landcover_path), pattern=".tif", replacement="")
   
   #read pesticide table
-  forage_table <- read.csv(foragetable_path)
+  if (!is.na(foragetable_path)) {
+    forage_table <- read.csv(foragetable_path)
+  }
   
   #check to see if output directory already exists. Make if it doesn't exist.
   if (!dir.exists(output_dir)){
