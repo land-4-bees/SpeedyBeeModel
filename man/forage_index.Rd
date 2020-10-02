@@ -15,7 +15,6 @@ forage_index(
   agg_factor = NA,
   normalize = T,
   useW = F,
-  check_foragetable = T,
   rastertag = NA,
   compress_rasters = T
 )

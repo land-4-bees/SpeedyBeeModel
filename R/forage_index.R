@@ -22,8 +22,7 @@
 forage_index <- function(output_dir, landcover_path, foragetable_path = NA, 
                           forage_table, seasons, forage_range = NA, guild_table = NA, 
                           agg_factor=NA, normalize=T, useW=F, 
-                          check_foragetable=T, rastertag=NA,
-                          compress_rasters=T) {
+                          rastertag=NA, compress_rasters=T) {
     
   tifoptions <- c("COMPRESS=DEFLATE", "PREDICTOR=2", "ZLEVEL=6")
   
@@ -40,40 +39,42 @@ forage_index <- function(output_dir, landcover_path, foragetable_path = NA,
     dir.create(output_dir)
   }
   
-  #calculate abundance weighted foraging range from guild table
-  guild <- read.csv(guild_table)
-  #scale relative abundance so it sums to one
-  guild$relative_abundance <- guild$relative_abundance/sum(guild$relative_abundance)
-  
-  #calculate abundance weighted average foraging range of all species in guild table
-  mean_FR <- sum(guild$alpha*guild$relative_abundance) 
-
-  #if multiple species in the guild table, summarize as one species
-  #it is not necessary to summarize by nesting guild, because nesting is not included
-  #this is a variation from Lonsdorf et al (2009), which estimated bee abundance as product of nesting and forage
-  if (length(guild[,1]) > 1) {
-    guild <- dplyr::select(guild, -dplyr::starts_with('nesting'),) %>%
-      dplyr::mutate(dplyr::across(dplyr::starts_with('foraging')|alpha, 
-                                  function(x){x*relative_abundance})) %>%
-      dplyr::summarise(dplyr::across(dplyr::starts_with('foraging')|alpha, sum))
+  if (is.na(forage_range)) {
+    #is the foraging activity for all species in all seasons the same?
+    guild <- read.csv(guild_table)
+    #scale relative abundance so it sums to one
+    guild$relative_abundance <- guild$relative_abundance/sum(guild$relative_abundance)
+    
+    #calculate abundance weighted average foraging range of all species in guild table
+    mean_FR <- sum(guild$alpha*guild$relative_abundance)
+    
+    #if multiple species in the guild table, summarize as one species
+    #it is not necessary to summarize by nesting guild, because nesting is not included
+    #this is a variation from Lonsdorf et al (2009), which estimated bee abundance as product of nesting and forage
+    if (length(guild[,1]) > 1) {
+      guild <- dplyr::select(guild, -dplyr::starts_with('nesting')) %>%
+        dplyr::mutate(dplyr::across(dplyr::starts_with('foraging')|alpha, 
+                                    function(x){x*relative_abundance})) %>%
+        dplyr::summarise(dplyr::across(dplyr::starts_with('foraging')|alpha, sum))
+    }
+    
+  } else {
+    mean_FR <- forage_range
   }
-  
+
   #read land use raster
   hab.r <- raster::raster(landcover_path) 
   
-  if (check_foragetable == T) {
-    #does pesticide table contain the same classes as land cover raster?
-    same <- unique(raster::values(hab.r)) %in% forage_table$LULC
-    
-    #raster land covers that are NOT in pesticide table
-    missing <- unique(raster::values(hab.r))[!same]
-    missing <- missing[!is.na(missing)]
-    
-    
-    #stop model execution if land cover raster has extra classes not in pesticide table
-    if (length(missing) > 0) {
-      stop("Land cover raster has classes that are not in the forage quality table.")
-    }
+  #does forage table contain the same classes as land cover raster?
+  same <- unique(raster::values(hab.r)) %in% forage_table$LULC
+  
+  #raster land covers that are NOT in pesticide table
+  missing <- unique(raster::values(hab.r))[!same]
+  missing <- missing[!is.na(missing)]
+  
+  #stop model execution if land cover raster has extra classes not in forage table
+  if (length(missing) > 0) {
+    stop("Land cover raster has classes that are not in the forage quality table.")
   }
   
   #####set up moving window
@@ -157,10 +158,8 @@ forage_index <- function(output_dir, landcover_path, foragetable_path = NA,
       raster::writeRaster(for.r, paste0(output_dir, "/for_reclass_agg_", land_name, ".tif"),
                           overwrite=F, NAflag=255, options=tifoptions)
       for.r <- raster::raster(paste0(output_dir, "/for_reclass_agg_", land_name, ".tif"))
-    }
   
-    #if aggregation factor is supplied, reduce land use raster resolution
-    if (!is.na(agg_factor)) {
+      #if aggregation factor is supplied, reduce land use raster resolution
       hab.r <- raster::aggregate(hab.r, fact = agg_factor,fun = raster::modal)
       raster::writeRaster(hab.r, paste0(output_dir, "/hab_agg_", land_name, ".tif"),
                           overwrite=F, NAflag=255, options=tifoptions)
@@ -179,7 +178,7 @@ forage_index <- function(output_dir, landcover_path, foragetable_path = NA,
       forage_dw <- smoothie::kernel2dsmooth(x=forage, K=effdist.v)
     }
     
-    #translate into raster
+    #translate matrix into raster
     simp.for <- raster::raster(forage_dw, template=for.r)
     
     #divide forage raster by window sum to adjust cells on edge of landscape 
