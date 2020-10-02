@@ -24,7 +24,7 @@ forage_index(
 
 \item{landcover_path}{Path to land cover raster, including base file name}
 
-\item{foragetable_path}{Path to forage quality by land use table}
+\item{foragetable_path}{Path to forage quality by land use table (CDL class integers should be in column called 'lucode')}
 
 \item{forage_table}{Forage quality by land use table (insead of foragetable_path)}
 
