@@ -33,7 +33,7 @@ forage_index(
 
 \item{forage_range}{Foraging range (in m) to use for distance weighting forage scores surrounding focal cell.}
 
-\item{guild_table}{Bee community to use to model foraging activity. Includes foraging range and relative abundnace of each species.
+\item{guild_table}{Bee community to use to model foraging activity. Includes foraging range and relative abundance of each species.
 
 #optional parameters}
 

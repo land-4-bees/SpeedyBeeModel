@@ -7,7 +7,7 @@
 #' @param forage_table Forage quality by land use table (insead of foragetable_path)
 #' @param seasons seasons to include. Must match names of forage table.
 #' @param forage_range Foraging range (in m) to use for distance weighting forage scores surrounding focal cell.
-#' @param guild_table Bee community to use to model foraging activity. Includes foraging range and relative abundnace of each species.
+#' @param guild_table Bee community to use to model foraging activity. Includes foraging range and relative abundance of each species.
 #' 
 #' #optional parameters
 #' @param agg_factor Aggregation factor for large rasters (use 4 to convert 50m to 120m resolution CDL)
