@@ -19,7 +19,7 @@
 #' 
 forage_index <- function(output_dir, landcover_path, foragetable_path = NA, 
                           forage_table, forage_range = NA, guild_table = NA, 
-                          agg_factor=NA, normalize=F, useW=F, 
+                          agg_factor=NA, normalize=T, useW=F, 
                           check_foragetable=T, seasons, rastertag=NA,
                           compress_rasters=T) {
     

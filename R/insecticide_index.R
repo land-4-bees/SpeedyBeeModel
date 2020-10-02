@@ -9,6 +9,8 @@
 #' @param ins_method Insecticide toxic load measure to use. Specify 'oral', 'contact' or 'mean' (mean of 'oral' and 'contact').  
 #' @param agg_factor Aggregation factor for large rasters (use 4 to convert 50m to 120m resolution CDL)
 #' @param normalize Normalize values by the number of cells within each moving window?
+#' @param rastertag Text string to include in name of output raster, optional
+
 #'
 #' @keywords insecticide index
 #' @examples
@@ -16,7 +18,8 @@
 #' 
 insecticide_index <- function(output_dir, landcover_path, pesticide_path, 
                               forage_range = NA, guild_table = NA, ins_method='mean',
-                              agg_factor=NA, normalize=F, useW=F, check_pesttable=T) {
+                              agg_factor=NA, normalize=F, useW=F, check_pesttable=T,
+                              rastertag='insecticide') {
     
   #save landscape name, use to label results rasters
   land_name <- gsub(basename(landcover_path), pattern=".tif", replacement="")
@@ -176,7 +179,13 @@ insecticide_index <- function(output_dir, landcover_path, pesticide_path,
     simp.ins <- simp.ins * mask_land
   }
   
-  #write output raster
-  raster::writeRaster(simp.ins, paste0(output_dir,"/", land_name, "insecticide.tif"), overwrite=T)
-
+  if (!is.na(rastertag)) {
+    #write output raster
+    raster::writeRaster(simp.ins, paste0(output_dir,"/", land_name,  
+                                        "_", rastertag, ".tif"), overwrite=T)
+  } else {
+    #write output raster
+    raster::writeRaster(simp.ins, paste0(output_dir,"/", land_name, ".tif"), 
+                                        overwrite=T)
+  }
 }
