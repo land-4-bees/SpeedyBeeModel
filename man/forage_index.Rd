@@ -9,13 +9,13 @@ forage_index(
   landcover_path,
   foragetable_path = NA,
   forage_table,
+  seasons,
   forage_range = NA,
   guild_table = NA,
   agg_factor = NA,
-  normalize = F,
+  normalize = T,
   useW = F,
   check_foragetable = T,
-  seasons,
   rastertag = NA,
   compress_rasters = T
 )
@@ -29,17 +29,19 @@ forage_index(
 
 \item{forage_table}{Forage quality by land use table (insead of foragetable_path)}
 
+\item{seasons}{seasons to include. Must match names of forage table.}
+
 \item{forage_range}{Foraging range (in m) to use for distance weighting forage scores surrounding focal cell.}
 
-\item{guild_table}{Bee community to use to model foraging activity. Includes foraging range and relative abundnace of each species.}
+\item{guild_table}{Bee community to use to model foraging activity. Includes foraging range and relative abundnace of each species.
+
+#optional parameters}
 
 \item{agg_factor}{Aggregation factor for large rasters (use 4 to convert 50m to 120m resolution CDL)}
 
 \item{normalize}{Normalize values by the number of cells within each moving window?}
 
-\item{seasons}{seasons to include. Must match names of forage table.}
-
-\item{rastertag}{Text string to include in name of output raster, optional}
+\item{rastertag}{Text string to include in name of output raster}
 }
 \description{
 New implemenatation of landsacpe forage quality index (Lonsdorf et al 2009). Uses FFT convolution to improve runtime.

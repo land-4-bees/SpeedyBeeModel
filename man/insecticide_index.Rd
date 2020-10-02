@@ -14,7 +14,8 @@ insecticide_index(
   agg_factor = NA,
   normalize = F,
   useW = F,
-  check_pesttable = T
+  check_pesttable = T,
+  rastertag = "insecticide"
 )
 }
 \arguments{
@@ -33,6 +34,8 @@ insecticide_index(
 \item{agg_factor}{Aggregation factor for large rasters (use 4 to convert 50m to 120m resolution CDL)}
 
 \item{normalize}{Normalize values by the number of cells within each moving window?}
+
+\item{rastertag}{Text string to include in name of output raster, optional}
 }
 \description{
 New implemenatation of landsacpe insecticide toxic load index (Douglas et al.). Uses FFT convolution to improve runtime.

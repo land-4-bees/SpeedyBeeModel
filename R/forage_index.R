@@ -5,12 +5,14 @@
 #' @param landcover_path Path to land cover raster, including base file name
 #' @param foragetable_path Path to forage quality by land use table
 #' @param forage_table Forage quality by land use table (insead of foragetable_path)
+#' @param seasons seasons to include. Must match names of forage table.
 #' @param forage_range Foraging range (in m) to use for distance weighting forage scores surrounding focal cell.
 #' @param guild_table Bee community to use to model foraging activity. Includes foraging range and relative abundnace of each species.
+#' 
+#' #optional parameters
 #' @param agg_factor Aggregation factor for large rasters (use 4 to convert 50m to 120m resolution CDL)
 #' @param normalize Normalize values by the number of cells within each moving window?
-#' @param seasons seasons to include. Must match names of forage table.
-#' @param rastertag Text string to include in name of output raster, optional
+#' @param rastertag Text string to include in name of output raster
 #'
 #' @keywords forage index
 #' @export
@@ -18,9 +20,9 @@
 #' 
 #' 
 forage_index <- function(output_dir, landcover_path, foragetable_path = NA, 
-                          forage_table, forage_range = NA, guild_table = NA, 
+                          forage_table, seasons, forage_range = NA, guild_table = NA, 
                           agg_factor=NA, normalize=T, useW=F, 
-                          check_foragetable=T, seasons, rastertag=NA,
+                          check_foragetable=T, rastertag=NA,
                           compress_rasters=T) {
     
   tifoptions <- c("COMPRESS=DEFLATE", "PREDICTOR=2", "ZLEVEL=6")
