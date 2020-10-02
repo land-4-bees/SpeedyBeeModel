@@ -7,7 +7,8 @@
 forage_index(
   output_dir,
   landcover_path,
-  foragetable_path,
+  foragetable_path = NA,
+  forage_table,
   forage_range = NA,
   guild_table = NA,
   agg_factor = NA,
@@ -15,7 +16,8 @@ forage_index(
   useW = F,
   check_foragetable = T,
   seasons,
-  rastertag = NA
+  rastertag = NA,
+  compress_rasters = T
 )
 }
 \arguments{
@@ -24,6 +26,8 @@ forage_index(
 \item{landcover_path}{Path to land cover raster, including base file name}
 
 \item{foragetable_path}{Path to forage quality by land use table}
+
+\item{forage_table}{Forage quality by land use table (insead of foragetable_path)}
 
 \item{forage_range}{Foraging range (in m) to use for distance weighting forage scores surrounding focal cell.}
 

@@ -2,5 +2,4 @@
 
 export("%>%")
 export(forage_index)
-export(insecticide_index)
 importFrom(magrittr,"%>%")

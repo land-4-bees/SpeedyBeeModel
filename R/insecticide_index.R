@@ -11,7 +11,6 @@
 #' @param normalize Normalize values by the number of cells within each moving window?
 #'
 #' @keywords insecticide index
-#' @export
 #' @examples
 #' 
 #' 
@@ -178,6 +177,6 @@ insecticide_index <- function(output_dir, landcover_path, pesticide_path,
   }
   
   #write output raster
-  raster::writeRaster(simp.ins, paste0(output_dir,"/", land_name, ".tif"), overwrite=T)
+  raster::writeRaster(simp.ins, paste0(output_dir,"/", land_name, "insecticide.tif"), overwrite=T)
 
 }
