@@ -40,9 +40,5 @@ insecticide_index(
 \description{
 New implemenatation of landsacpe insecticide toxic load index (Douglas et al.). Uses FFT convolution to improve runtime.
 }
-\examples{
-
-
-}
 \keyword{index}
 \keyword{insecticide}
