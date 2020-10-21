@@ -14,6 +14,7 @@
 #'
 #' @keywords insecticide index
 #' @examples
+#' @export
 #' 
 #' 
 insecticide_index <- function(output_dir, landcover_path, pesticide_path, 
