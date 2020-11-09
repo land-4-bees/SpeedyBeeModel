@@ -46,12 +46,6 @@ insecticide_index <- function(output_dir, landcover_path, pesticide_path,
     #scale relative abundance so it sums to one
     guild$relative_abundance <- guild$relative_abundance/sum(guild$relative_abundance)
     
-    # forage_values <- dplyr::select(guild, dplyr::starts_with('foraging_activity'))
-    # fvalues <- unique(c(t(forage_values))) #unique values in 'foraging activity' columns
-    # if (length(fvalues) == 1) {
-    #   stop('The foraging activity constants in the guild table must not all be the same value.')
-    # }
-    
     #calculate abundance weighted average foraging range of all species in guild table
     mean_FR <- sum(guild$alpha*guild$relative_abundance) 
   } else {

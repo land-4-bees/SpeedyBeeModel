@@ -66,7 +66,7 @@ forage_index <- function(output_dir, landcover_path, foragetable_path = NA,
   hab.r <- raster::raster(landcover_path) 
   
   #does forage table contain the same classes as land cover raster?
-  same <- unique(raster::values(hab.r)) %in% forage_table$lucode
+  same <- unique(raster::values(hab.r)) %in% forage_table$LULC
   
   #raster land covers that are NOT in pesticide table
   missing <- unique(raster::values(hab.r))[!same]
