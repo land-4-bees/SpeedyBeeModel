@@ -3,7 +3,7 @@
 #' New implemenatation of landsacpe forage quality index (Lonsdorf et al 2009). Uses FFT convolution to improve runtime.
 #' @param output_dir Path to directory for output files.
 #' @param landcover_path Path to land cover raster, including base file name
-#' @param foragetable_path Path to forage quality by land use table (CDL class integers should be in column called 'lucode')
+#' @param foragetable_path Path to forage quality by land use table (CDL class integers should be in column called 'LULC')
 #' @param forage_table Forage quality by land use table (insead of foragetable_path)
 #' @param seasons seasons to include. Must match names of forage table.
 #' @param forage_range Foraging range (in m) to use for distance weighting forage scores surrounding focal cell.
@@ -29,9 +29,12 @@ forage_index <- function(output_dir, landcover_path, foragetable_path = NA,
   #save landscape name, use to label results rasters
   land_name <- gsub(basename(landcover_path), pattern=".tif", replacement="")
   
-  #read pesticide table
+  #read forage quality table
   if (!is.na(foragetable_path)) {
     forage_table <- read.csv(foragetable_path)
+    if(!'LULC' %in% names(forage_table)) {
+      stop('Forage table must have column called LULC with integer land use code.')
+    }
   }
   
   #check to see if output directory already exists. Make if it doesn't exist.
@@ -148,7 +151,7 @@ forage_index <- function(output_dir, landcover_path, foragetable_path = NA,
   for (season in seasons) {
     fcolumn <- names(dplyr::select(forage_table, dplyr::contains(season, ignore.case = T)))
     #reclassify land use to seasonal forage index
-    for.r <- raster::reclassify(hab.r, forage_table[,c("lucode", fcolumn)])
+    for.r <- raster::reclassify(hab.r, forage_table[,c("LULC", fcolumn)])
     
     #if specified, aggregate forage raster to larger cell size
     if (!is.na(agg_factor)) {

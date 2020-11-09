@@ -26,13 +26,18 @@ insecticide_index <- function(output_dir, landcover_path, pesticide_path,
   logger::log_threshold(DEBUG)
   logger::log_info('Starting setup.')
   
-  
   #save landscape name, use to label results rasters
   land_name <- gsub(basename(landcover_path), pattern=".tif", replacement="")
   
   #read pesticide table
-  pesticide_table <- read.csv(pesticide_path)
+  pestable <- read.csv(pesticide_path)
   
+  if(!'value' %in% names(pestable)) {
+    stop('Forage table must have column called LULC with integer land use code.')
+  }
+  #rename land use code in pesticide table
+  pestable <- dplyr::rename(pestable, Value = value)
+
   #check to see if output directory already exists (if so, InVEST model will not overwrite)
   if (dir.exists(output_dir)){
     warning('Output directory already exists. New insecticide raster will not overwrite existing file with the same name.')
@@ -54,9 +59,7 @@ insecticide_index <- function(output_dir, landcover_path, pesticide_path,
   
   #read land use raster
   hab.r <- raster::raster(landcover_path) 
-  
-  #read pesticide table
-  pestable <- dplyr::rename(pesticide_table, Value = value)
+
   
   if (check_pesttable == T) {
     #does pesticide table contain the same classes as land cover raster?
