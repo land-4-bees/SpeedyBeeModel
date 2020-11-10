@@ -204,4 +204,10 @@ forage_index <- function(output_dir, landcover_path, foragetable_path = NA,
                                            ".tif"), overwrite=T, options=tifoptions)
     }
   }
+  if(normalize == T) {
+    rm(hab.r, for.r, forage, forage_dw, simp.for, mask_land, mask, window_sum)
+  } else {
+    rm(hab.r, for.r, forage, forage_dw, simp.for, weight.m, effdist.v)
+  }
+  gc()
 }
