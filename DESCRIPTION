@@ -14,7 +14,8 @@ LazyData: true
 Imports: 
     magrittr,
     raster,
-    smoothie
+    smoothie,
+    logger
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
 
