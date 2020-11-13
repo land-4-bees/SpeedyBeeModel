@@ -24,7 +24,9 @@ forage_index <- function(output_dir, landcover_path, foragetable_path = NA,
                           agg_factor=NA, normalize=T, useW=F, 
                           rastertag=NA, compress_rasters=T) {
     
-  tifoptions <- c("COMPRESS=DEFLATE", "PREDICTOR=2", "ZLEVEL=6")
+  #set up logging
+  logger::log_threshold(DEBUG)
+  logger::log_info('Starting setup.')
   
   #save landscape name, use to label results rasters
   land_name <- gsub(basename(landcover_path), pattern=".tif", replacement="")
@@ -71,7 +73,7 @@ forage_index <- function(output_dir, landcover_path, foragetable_path = NA,
   #does forage table contain the same classes as land cover raster?
   same <- unique(raster::values(hab.r)) %in% forage_table$LULC
   
-  #raster land covers that are NOT in pesticide table
+  #raster land covers that are NOT in landcover table
   missing <- unique(raster::values(hab.r))[!same]
   missing <- missing[!is.na(missing)]
   
@@ -115,6 +117,9 @@ forage_index <- function(output_dir, landcover_path, foragetable_path = NA,
   
   # set 0, when effdist > (2xforaging distance)
   effdist.v[which(dist.m > maxforage.dist)] <- 0
+  
+  logger::log_info('Setup complete, ready to begin distance weighting.')
+  
   
   #set up window sum raster (used in normalization later)
   if (normalize == T) {
@@ -169,9 +174,9 @@ forage_index <- function(output_dir, landcover_path, foragetable_path = NA,
       hab.r <- raster::raster(paste0(output_dir, "/hab_agg_", land_name, ".tif"))
     }
   
-    #####calculate distance weighted pesticide index
+    #####calculate distance weighted forage index
     
-    #try distance weighting with FFT convolution
+    #distance weighting with FFT convolution
     forage <- raster::as.matrix(for.r)
     
     if (useW == T) {
