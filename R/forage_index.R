@@ -23,7 +23,7 @@ forage_index <- function(output_dir, landcover_path, foragetable_path = NA,
                           forage_table, seasons, forage_range = NA, guild_table = NA, 
                           agg_factor=NA, normalize=T, useW=F, 
                           rastertag=NA, compress_rasters=T) {
-    
+  library(logger)
   #set up logging
   logger::log_threshold(DEBUG)
   logger::log_info('Starting setup.')
