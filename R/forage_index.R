@@ -149,7 +149,7 @@ forage_index <- function(output_dir, landcover_path, foragetable_path = NA,
         dir.create(paste0(output_dir,"/intermediate"))
       }
     
-      raster::writeRaster(window_sum, windowsum_path, overwrite=T, options=tifoptions)
+      raster::writeRaster(window_sum, windowsum_path, overwrite=T)
       logger::log_info('Generated window-sum raster. First FFT complete.')
     }
   }
@@ -167,13 +167,13 @@ forage_index <- function(output_dir, landcover_path, foragetable_path = NA,
       
       #strange behavior with applying moving window analysis to raster necessitates writing and reading aggregated rasters again
       raster::writeRaster(for.r, paste0(output_dir, "/for_reclass_agg_", land_name, ".tif"),
-                          overwrite=F, NAflag=255, options=tifoptions)
+                          overwrite=F, NAflag=255)
       for.r <- raster::raster(paste0(output_dir, "/for_reclass_agg_", land_name, ".tif"))
   
       #if aggregation factor is supplied, reduce land use raster resolution
       hab.r <- raster::aggregate(hab.r, fact = agg_factor,fun = raster::modal)
       raster::writeRaster(hab.r, paste0(output_dir, "/hab_agg_", land_name, ".tif"),
-                          overwrite=F, NAflag=255, options=tifoptions)
+                          overwrite=F, NAflag=255)
       hab.r <- raster::raster(paste0(output_dir, "/hab_agg_", land_name, ".tif"))
     }
   
@@ -208,11 +208,11 @@ forage_index <- function(output_dir, landcover_path, foragetable_path = NA,
     if (!is.na(rastertag)) {
       #write output raster
       raster::writeRaster(simp.for, paste0(output_dir,"/", land_name, "_", season, 
-                         "_", rastertag, ".tif"), overwrite=T, options=tifoptions)
+                         "_", rastertag, ".tif"), overwrite=T)
     } else {
       #write output raster
       raster::writeRaster(simp.for, paste0(output_dir,"/", land_name, "_", season, 
-                                           ".tif"), overwrite=T, options=tifoptions)
+                                           ".tif"), overwrite=T)
     }
   }
   if(normalize == T) {
