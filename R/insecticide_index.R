@@ -70,9 +70,9 @@ insecticide_index <- function(output_dir, landcover_path, pesticide_path,
     missing <- missing[!is.na(missing)]
     
     
-    #stop model execution if land cover raster has extra classes not in pesticide table
+    #warn if land cover raster has extra classes not in pesticide table
     if (length(missing) > 0) {
-      stop("Land cover raster has classes that are not in the insecticide table.")
+      warning("Land cover raster has classes that are not in the insecticide table.")
     }
   }
   

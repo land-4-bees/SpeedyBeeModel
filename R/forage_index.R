@@ -77,9 +77,9 @@ forage_index <- function(output_dir, landcover_path, foragetable_path = NA,
   missing <- unique(raster::values(hab.r))[!same]
   missing <- missing[!is.na(missing)]
   
-  #stop model execution if land cover raster has extra classes not in forage table
+  #warn if land cover raster has extra classes not in forage table
   if (length(missing) > 0) {
-    stop("Land cover raster has classes that are not in the forage quality table.")
+    warning("Land cover raster has classes that are not in the forage quality table.")
   }
   
   #####set up moving window
