@@ -22,11 +22,11 @@
 forage_index <- function(output_dir, landcover_path, foragetable_path = NA, 
                           forage_table, seasons, forage_range = NA, guild_table = NA, 
                           agg_factor=NA, normalize=T, useW=F, 
-                          rastertag=NA, compress_rasters=T) {
+                          rastertag=NA, verbose=T) {
   library(logger)
   #set up logging
   logger::log_threshold(DEBUG)
-  logger::log_info('Starting setup.')
+  if (verbose == T) {logger::log_info('Starting setup.')}
   
   #save landscape name, use to label results rasters
   land_name <- gsub(basename(landcover_path), pattern=".tif", replacement="")
@@ -118,7 +118,7 @@ forage_index <- function(output_dir, landcover_path, foragetable_path = NA,
   # set 0, when effdist > (2xforaging distance)
   effdist.v[which(dist.m > maxforage.dist)] <- 0
   
-  logger::log_info('Setup complete, ready to begin distance weighting.')
+  if (verbose == T) {logger::log_info('Setup complete, ready to begin distance weighting.')}
   
   
   #set up window sum raster (used in normalization later)
@@ -150,11 +150,11 @@ forage_index <- function(output_dir, landcover_path, foragetable_path = NA,
       }
     
       raster::writeRaster(window_sum, windowsum_path, overwrite=T)
-      logger::log_info('Generated window-sum raster. First FFT complete.')
+      if (verbose == T) {logger::log_info('Generated window-sum raster. First FFT complete.')}
     }
   }
   
-  logger::log_info('Starting seasonal forage index calculations. Reclass land use to appropriate seasonal forage value.')
+  if (verbose == T) {logger::log_info('Starting seasonal forage index calculations. Reclass land use to appropriate seasonal forage value.')}
   
   for (season in seasons) {
     fcolumn <- names(dplyr::select(forage_table, dplyr::contains(season, ignore.case = T)))
@@ -179,7 +179,7 @@ forage_index <- function(output_dir, landcover_path, foragetable_path = NA,
   
     #####calculate distance weighted forage index
     
-    logger::log_info('Translate raster to matrix and begin distance-weighting of seasonal forage.')
+    if (verbose == T){logger::log_info('Translate raster to matrix and begin distance-weighting of seasonal forage.')}
     
     #distance weighting with FFT convolution
     forage <- raster::as.matrix(for.r)
@@ -203,7 +203,7 @@ forage_index <- function(output_dir, landcover_path, foragetable_path = NA,
       #clip distance weighted raster to boundary of land use raster
       simp.for <- simp.for * mask_land
     }
-    logger::log_info('One forage map is complete!')
+    if (verbose== T){logger::log_info('One forage map is complete!')}
     
     if (!is.na(rastertag)) {
       #write output raster
@@ -221,6 +221,6 @@ forage_index <- function(output_dir, landcover_path, foragetable_path = NA,
     rm(hab.r, for.r, forage, forage_dw, simp.for, weight.m, effdist.v)
   }
   gc()
-  logger::log_info('All forage maps are complete!')
+  if (verbose ==T){logger::log_info('All forage maps are complete!')}
   
 }

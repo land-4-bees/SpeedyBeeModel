@@ -20,11 +20,11 @@
 insecticide_index <- function(output_dir, landcover_path, pesticide_path, 
                               forage_range = NA, guild_table = NA, ins_method='mean',
                               agg_factor=NA, normalize=F, useW=F, check_pesttable=T,
-                              rastertag='insecticide') {
+                              rastertag='insecticide', verbose=T) {
     
   #set up logging
   logger::log_threshold(DEBUG)
-  logger::log_info('Starting setup.')
+  if (verbose == T){logger::log_info('Starting setup.')}
   
   #save landscape name, use to label results rasters
   land_name <- gsub(basename(landcover_path), pattern=".tif", replacement="")
@@ -143,12 +143,12 @@ insecticide_index <- function(output_dir, landcover_path, pesticide_path,
     hab.r <- raster::raster(paste0(output_dir, "/hab_agg_", land_name, ".tif"))
   }
   
-  logger::log_info('Setup complete, ready to begin distance weighting.')
+  if (verbose == T){logger::log_info('Setup complete, ready to begin distance weighting.')}
   #####calculate distance weighted pesticide index
   
   #try distance weighting with FFT convolution
   ins <- raster::as.matrix(ins.r)
-  logger::log_info('Insecticide raster converted to matrix for FFT.')
+  if (verbose == T){logger::log_info('Insecticide raster converted to matrix for FFT.')}
   
   if (useW == T) {
     FFT_matrix <- smoothie::kernel2dsmooth(x=ins, K=effdist.v, setup=T)
@@ -156,11 +156,11 @@ insecticide_index <- function(output_dir, landcover_path, pesticide_path,
   } else {
     ins_dw <- smoothie::kernel2dsmooth(x=ins, K=effdist.v)
   }
-  logger::log_info('Completed first FFT of insecticide raster')
+  if (verbose == T){logger::log_info('Completed first FFT of insecticide raster')}
   
   #translate into raster
   simp.ins <- raster::raster(ins_dw, template=ins.r)
-  logger::log_info('Insecticide FFT matrix successfully translated to raster object.')
+  if (verbose == T){logger::log_info('Insecticide FFT matrix successfully translated to raster object.')}
   
   
   if (normalize == T) {
@@ -175,19 +175,19 @@ insecticide_index <- function(output_dir, landcover_path, pesticide_path,
     } else {
       mask_dw <- smoothie::kernel2dsmooth(x=mask, K=effdist.v)
     }
-    logger::log_info('Completed second FFT of binary habitat mask (generates window sums layers).')
+    if (verbose == T){logger::log_info('Completed second FFT of binary habitat mask (generates window sums layers).')}
     
     #translate moving window sums into raster
     window_sum <- raster::raster(mask_dw, template=mask_land)
     
-    logger::log_info('Window sum FFT matrix successfully translated to raster object.')
+    if (verbose == T){logger::log_info('Window sum FFT matrix successfully translated to raster object.')}
     
     #divide the distance weighted insecticide raster by the moving window sum
     simp.ins <- simp.ins/window_sum
     
     #clip distance weighted raster to boundary of land use raster
     simp.ins <- simp.ins * mask_land
-    logger::log_info('Insecticide raster divided by window sum and multiplied by habitat mask.')
+    if (verbose == T){logger::log_info('Insecticide raster divided by window sum and multiplied by habitat mask.')}
     
   }
   
@@ -200,7 +200,7 @@ insecticide_index <- function(output_dir, landcover_path, pesticide_path,
     raster::writeRaster(simp.ins, paste0(output_dir,"/", land_name, ".tif"), 
                         overwrite=T)
   }
-  logger::log_info('Write final insecticide raster is complete.')
+  if (verbose == T){logger::log_info('Write final insecticide raster is complete.')}
   
   if(normalize == T) {
     rm(hab.r, ins.r, ins, ins_dw, mask_land, mask, window_sum, simp.ins)
