@@ -16,7 +16,7 @@ forage_index(
   normalize = T,
   useW = F,
   rastertag = NA,
-  compress_rasters = T
+  verbose = T
 )
 }
 \arguments{
@@ -41,6 +41,8 @@ forage_index(
 \item{normalize}{Normalize values by the number of cells within each moving window?}
 
 \item{rastertag}{Text string to include in name of output raster}
+
+\item{verbose}{Include more log messages from model run?}
 }
 \description{
 New implemenatation of landsacpe forage quality index (Lonsdorf et al 2009). Uses FFT convolution to improve runtime.

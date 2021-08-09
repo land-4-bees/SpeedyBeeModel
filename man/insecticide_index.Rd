@@ -15,7 +15,8 @@ insecticide_index(
   normalize = F,
   useW = F,
   check_pesttable = T,
-  rastertag = "insecticide"
+  rastertag = "insecticide",
+  verbose = T
 )
 }
 \arguments{
@@ -36,6 +37,8 @@ insecticide_index(
 \item{normalize}{Normalize values by the number of cells within each moving window?}
 
 \item{rastertag}{Text string to include in name of output raster, optional}
+
+\item{verbose}{Include more log messages from model run?}
 }
 \description{
 New implemenatation of landsacpe insecticide toxic load index (Douglas et al.). Uses FFT convolution to improve runtime.

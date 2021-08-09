@@ -10,6 +10,8 @@
 #' @param agg_factor Aggregation factor for large rasters (use 4 to convert 50m to 120m resolution CDL)
 #' @param normalize Normalize values by the number of cells within each moving window?
 #' @param rastertag Text string to include in name of output raster, optional
+#' @param verbose Include more log messages from model run?
+
 
 #'
 #' @keywords insecticide index
