@@ -1,12 +1,12 @@
-#' Calculate landscape forage quality index
+#' Calculate landscape nesting quality index
 #'
-#' New implementation of landscape forage quality index (Lonsdorf et al 2009). Uses FFT convolution to improve runtime.
+#' Variation of landscape nesting quality index (Lonsdorf et al 2009). Uses FFT convolution to improve runtime. 
 #' @param output_dir Path to directory for output files.
 #' @param landcover_path Path to land cover raster, including base file name
-#' @param foragetable_path Path to forage quality by land use table (CDL class integers should be in column called 'LULC')
-#' @param forage_table Forage quality by land use table (insead of foragetable_path)
-#' @param seasons seasons to include. Must match names of forage table.
-#' @param forage_range Foraging range (in m) to use for distance weighting forage scores surrounding focal cell.
+#' @param habitattable_path Path to habitat quality by land use table (CDL class integers should be in column called 'LULC')
+#' @param habitat_table Habitat quality by land use table (instead of habitattable_path)
+#' @param nest_locations Nesting types to include. Must match names of habitat table.
+#' @param forage_range Foraging range (in m) to use for distance weighting scores surrounding focal cell.
 #' @param guild_table Bee community to use to model foraging activity. Includes foraging range and relative abundance of each species.
 #' 
 #' #optional parameters
@@ -16,15 +16,15 @@
 #' @param verbose Include more log messages from model run?
 
 #'
-#' @keywords forage index
+#' @keywords nesting index
 #' @export
 #' @examples
 #' @details 
 #' It is necessary to specify 'forage_range' OR 'guild_table,' not both.
 #'
 #' 
-forage_index <- function(output_dir, landcover_path, foragetable_path = NA, 
-                          forage_table, seasons, forage_range = NA, guild_table = NA, 
+nesting_index <- function(output_dir, landcover_path, habitattable_path = NA, 
+                          habitat_table, nest_locations, forage_range = NA, guild_table = NA, 
                           agg_factor=NA, normalize=T, useW=F, 
                           rastertag=NA, verbose=T) {
   library(logger)
@@ -35,11 +35,11 @@ forage_index <- function(output_dir, landcover_path, foragetable_path = NA,
   #save landscape name, use to label results rasters
   land_name <- gsub(basename(landcover_path), pattern=".tif", replacement="")
   
-  #read forage quality table
-  if (!is.na(foragetable_path)) {
-    forage_table <- read.csv(foragetable_path)
-    if(!'LULC' %in% names(forage_table)) {
-      stop('Forage table must have column called LULC with integer land use code.')
+  #read habitat table
+  if (!is.na(habitattable_path)) {
+    habitat_table <- read.csv(habitattable_path)
+    if(!'LULC' %in% names(habitat_table)) {
+      stop('Habitat table must have column called LULC with integer land use code.')
     }
   }
   
@@ -49,7 +49,7 @@ forage_index <- function(output_dir, landcover_path, foragetable_path = NA,
   }
   
   if (is.na(forage_range)) {
-    #is the foraging activity for all species in all seasons the same?
+    #is the foraging activity for all species in all nest_locations the same?
     guild <- read.csv(guild_table)
     #scale relative abundance so it sums to one
     guild$relative_abundance <- guild$relative_abundance/sum(guild$relative_abundance)
@@ -61,10 +61,10 @@ forage_index <- function(output_dir, landcover_path, foragetable_path = NA,
     #it is not necessary to summarize by nesting guild, because nesting is not included
     #this is a variation from Lonsdorf et al (2009), which estimated bee abundance as product of nesting and forage
     if (length(guild[,1]) > 1) {
-      guild <- dplyr::select(guild, -dplyr::starts_with('nesting')) %>%
-        dplyr::mutate(dplyr::across(dplyr::starts_with('foraging')|alpha, 
+      guild <- dplyr::select(guild, -dplyr::starts_with('foraging')) %>%
+        dplyr::mutate(dplyr::across(dplyr::starts_with('nesting')|alpha, 
                                     function(x){x*relative_abundance})) %>%
-        dplyr::summarise(dplyr::across(dplyr::starts_with('foraging')|alpha, sum))
+        dplyr::summarise(dplyr::across(dplyr::starts_with('nesting')|alpha, sum))
     }
     
   } else {
@@ -74,16 +74,16 @@ forage_index <- function(output_dir, landcover_path, foragetable_path = NA,
   #read land use raster
   hab.r <- raster::raster(landcover_path) 
   
-  #does forage table contain the same classes as land cover raster?
-  same <- unique(raster::values(hab.r)) %in% forage_table$LULC
+  #does habtiat table contain the same classes as land cover raster?
+  same <- unique(raster::values(hab.r)) %in% habitat_table$LULC
   
   #raster land covers that are NOT in landcover table
   missing <- unique(raster::values(hab.r))[!same]
   missing <- missing[!is.na(missing)]
   
-  #warn if land cover raster has extra classes not in forage table
+  #warn if land cover raster has extra classes not in habitat table
   if (length(missing) > 0) {
-    stop("Land cover raster has classes that are not in the forage quality table.")
+    stop("Land cover raster has classes that are not in the habitat table.")
   }
   
   #####set up moving window
@@ -158,21 +158,22 @@ forage_index <- function(output_dir, landcover_path, foragetable_path = NA,
     }
   }
   
-  if (verbose == T) {logger::log_info('Starting seasonal forage index calculations. Reclass land use to appropriate seasonal forage value.')}
+  if (verbose == T) {logger::log_info('Starting nest index calculations for each nesting type. Reclass land use to appropriate nesting value.')}
   
-  for (season in seasons) {
-    fcolumn <- names(dplyr::select(forage_table, dplyr::contains(season, ignore.case = T)))
-    #reclassify land use to seasonal forage index
-    for.r <- raster::reclassify(hab.r, forage_table[,c("LULC", fcolumn)])
+  for (nest_location in nest_locations) {
+    fcolumn <- names(dplyr::select(habitat_table, dplyr::contains(nest_location, ignore.case = T)))
     
-    #if specified, aggregate forage raster to larger cell size
+    #reclassify land use to nesting index
+    nest.r <- raster::reclassify(hab.r, habitat_table[,c("LULC", fcolumn)])
+    
+    #if specified, aggregate nesting raster to larger cell size
     if (!is.na(agg_factor)) {
-      for.r <- raster::aggregate(for.r, fact = agg_factor, fun = mean)
+      nest.r <- raster::aggregate(nest.r, fact = agg_factor, fun = mean)
       
       #strange behavior with applying moving window analysis to raster necessitates writing and reading aggregated rasters again
-      raster::writeRaster(for.r, paste0(output_dir, "/for_reclass_agg_", land_name, ".tif"),
+      raster::writeRaster(nest.r, paste0(output_dir, "/nest_reclass_agg_", land_name, ".tif"),
                           overwrite=F, NAflag=255)
-      for.r <- raster::raster(paste0(output_dir, "/for_reclass_agg_", land_name, ".tif"))
+      nest.r <- raster::raster(paste0(output_dir, "/nest_reclass_agg_", land_name, ".tif"))
   
       #if aggregation factor is supplied, reduce land use raster resolution
       hab.r <- raster::aggregate(hab.r, fact = agg_factor,fun = raster::modal)
@@ -183,48 +184,48 @@ forage_index <- function(output_dir, landcover_path, foragetable_path = NA,
   
     #####calculate distance weighted forage index
     
-    if (verbose == T){logger::log_info('Translate raster to matrix and begin distance-weighting of seasonal forage.')}
+    if (verbose == T){logger::log_info('Translate raster to matrix and begin distance-weighting of nest index.')}
     
     #distance weighting with FFT convolution
-    forage <- raster::as.matrix(for.r)
+    nesting <- raster::as.matrix(nest.r)
     
     if (useW == T) {
-      FFT_matrix <- smoothie::kernel2dsmooth(x=forage, K=effdist.v, setup=T)
-      forage_dw <- smoothie::kernel2dsmooth(x=forage, W=FFT_matrix)
+      FFT_matrix <- smoothie::kernel2dsmooth(x=nesting, K=effdist.v, setup=T)
+      nesting_dw <- smoothie::kernel2dsmooth(x=nesting, W=FFT_matrix)
     } else {
-      forage_dw <- smoothie::kernel2dsmooth(x=forage, K=effdist.v)
+      nesting_dw <- smoothie::kernel2dsmooth(x=nesting, K=effdist.v)
     }
     
     #translate matrix into raster
-    simp.for <- raster::raster(forage_dw, template=for.r)
+    simp.for <- raster::raster(nesting_dw, template=nest.r)
     
-    #divide forage raster by window sum to adjust cells on edge of landscape 
-    #accounts for less available forage due to lack of resources 'outside' county raster
+    #divide nesting raster by window sum to adjust cells on edge of landscape 
+    #accounts for less available nesting due to lack of resources 'outside' county raster
     if (normalize==T){
-      #divide the distance weighted forage raster by the moving window sum
+      #divide the distance weighted nesting raster by the moving window sum
       simp.for <- simp.for/window_sum
       
       #clip distance weighted raster to boundary of land use raster
       simp.for <- simp.for * mask_land
     }
-    if (verbose== T){logger::log_info('One forage map is complete!')}
+    if (verbose== T){logger::log_info('One nesting map is complete!')}
     
     if (!is.na(rastertag)) {
       #write output raster
-      raster::writeRaster(simp.for, paste0(output_dir,"/", land_name, "_", season, 
+      raster::writeRaster(simp.for, paste0(output_dir,"/", land_name, "_", nest_location, 
                          "_", rastertag, ".tif"), overwrite=T)
     } else {
       #write output raster
-      raster::writeRaster(simp.for, paste0(output_dir,"/", land_name, "_", season, 
+      raster::writeRaster(simp.for, paste0(output_dir,"/", land_name, "_", nest_location, 
                                            ".tif"), overwrite=T)
     }
   }
   if(normalize == T) {
-    rm(hab.r, for.r, forage, forage_dw, simp.for, mask_land, window_sum)
+    rm(hab.r, nest.r, nesting, nesting_dw, simp.for, mask_land, window_sum)
   } else {
-    rm(hab.r, for.r, forage, forage_dw, simp.for, weight.m, effdist.v)
+    rm(hab.r, nest.r, nesting, nesting_dw, simp.for, weight.m, effdist.v)
   }
   gc()
-  if (verbose ==T){logger::log_info('All forage maps are complete!')}
+  if (verbose ==T){logger::log_info('All nesting maps are complete!')}
   
 }
