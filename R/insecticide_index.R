@@ -11,11 +11,8 @@
 #' @param normalize Normalize values by the number of cells within each moving window?
 #' @param rastertag Text string to include in name of output raster, optional
 #' @param verbose Include more log messages from model run?
-
-
 #'
 #' @keywords insecticide index
-#' @examples
 #' @export
 #' 
 #' 

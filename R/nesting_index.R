@@ -14,11 +14,9 @@
 #' @param normalize Normalize values by the number of cells within each moving window?
 #' @param rastertag Text string to include in name of output raster
 #' @param verbose Include more log messages from model run?
-
 #'
 #' @keywords nesting index
 #' @export
-#' @examples
 #' @details 
 #' It is necessary to specify 'forage_range' OR 'guild_table,' not both.
 #'

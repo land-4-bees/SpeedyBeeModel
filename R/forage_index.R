@@ -14,11 +14,9 @@
 #' @param normalize Normalize values by the number of cells within each moving window?
 #' @param rastertag Text string to include in name of output raster
 #' @param verbose Include more log messages from model run?
-
 #'
 #' @keywords forage index
 #' @export
-#' @examples
 #' @details 
 #' It is necessary to specify 'forage_range' OR 'guild_table,' not both.
 #'
@@ -165,6 +163,10 @@ forage_index <- function(output_dir, landcover_path, foragetable_path = NA,
     #reclassify land use to seasonal forage index
     for.r <- raster::reclassify(hab.r, forage_table[,c("LULC", fcolumn)])
     
+    #write output raster
+    raster::writeRaster(for.r, paste0(output_dir,"/", land_name, "_", season, "_forage"
+                                         , ".tif"), overwrite=T)
+    
     #if specified, aggregate forage raster to larger cell size
     if (!is.na(agg_factor)) {
       for.r <- raster::aggregate(for.r, fact = agg_factor, fun = mean)
@@ -219,12 +221,13 @@ forage_index <- function(output_dir, landcover_path, foragetable_path = NA,
                                            ".tif"), overwrite=T)
     }
   }
+  
   if(normalize == T) {
     rm(hab.r, for.r, forage, forage_dw, simp.for, mask_land, window_sum)
   } else {
     rm(hab.r, for.r, forage, forage_dw, simp.for, weight.m, effdist.v)
   }
   gc()
-  if (verbose ==T){logger::log_info('All forage maps are complete!')}
+  if (verbose ==T) {logger::log_info('All forage maps are complete!')}
   
 }
