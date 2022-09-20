@@ -163,8 +163,8 @@ forage_index <- function(output_dir, landcover_path, foragetable_path = NA,
     #reclassify land use to seasonal forage index
     for.r <- raster::reclassify(hab.r, forage_table[,c("LULC", fcolumn)])
     
-    #write output raster
-    raster::writeRaster(for.r, paste0(output_dir,"/", land_name, "_", season, "_forage"
+    #write land use reclassed to forage
+    raster::writeRaster(for.r, paste0(output_dir,"/", land_name, "_", season, "_foragereclass"
                                          , ".tif"), overwrite=T)
     
     #if specified, aggregate forage raster to larger cell size
@@ -213,11 +213,11 @@ forage_index <- function(output_dir, landcover_path, foragetable_path = NA,
     
     if (!is.na(rastertag)) {
       #write output raster
-      raster::writeRaster(simp.for, paste0(output_dir,"/", land_name, "_", season, 
+      raster::writeRaster(simp.for, paste0(output_dir,"/", land_name, "_", season, "_foragedistwt"
                          "_", rastertag, ".tif"), overwrite=T)
     } else {
       #write output raster
-      raster::writeRaster(simp.for, paste0(output_dir,"/", land_name, "_", season, 
+      raster::writeRaster(simp.for, paste0(output_dir,"/", land_name, "_", season, "_foragedistwt"
                                            ".tif"), overwrite=T)
     }
   }
