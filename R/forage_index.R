@@ -213,11 +213,11 @@ forage_index <- function(output_dir, landcover_path, foragetable_path = NA,
     
     if (!is.na(rastertag)) {
       #write output raster
-      raster::writeRaster(simp.for, paste0(output_dir,"/", land_name, "_", season, "_foragedistwt"
+      raster::writeRaster(simp.for, paste0(output_dir,"/", land_name, "_", season, "_foragedistwt",
                          "_", rastertag, ".tif"), overwrite=T)
     } else {
       #write output raster
-      raster::writeRaster(simp.for, paste0(output_dir,"/", land_name, "_", season, "_foragedistwt"
+      raster::writeRaster(simp.for, paste0(output_dir,"/", land_name, "_", season, "_foragedistwt",
                                            ".tif"), overwrite=T)
     }
   }
